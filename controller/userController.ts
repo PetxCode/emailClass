@@ -2,6 +2,7 @@
 import crypto from "crypto";
 import { Request, Response } from "express";
 import userModel from "../model/userModel";
+import { verifyMyAccount } from "../newEmail";
 import { resetPassword, verifyAccount } from "../util/email";
 
 export const createUser = async (req: Request, res: Response) => {
@@ -19,7 +20,7 @@ export const createUser = async (req: Request, res: Response) => {
       OTP,
       token,
     });
-    verifyAccount(user)
+    verifyMyAccount()
       .then(() => {
         console.log("mail sent");
       })
@@ -171,7 +172,7 @@ export const changePasswordUser = async (req: Request, res: Response) => {
     const myUser = await userModel.findById(id);
 
     if (myUser) {
-      if (myUser.token !== "" && myUser.verified) {
+      if (myUser.token === token && myUser.verified) {
         const user = await userModel.findByIdAndUpdate(
           id,
           {
